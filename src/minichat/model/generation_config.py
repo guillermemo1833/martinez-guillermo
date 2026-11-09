@@ -16,6 +16,10 @@ class GenerationConfig:
 
     Example:
         cfg = GenerationConfig(temperature=0.8, top_p=0.9)
+
+    Raises:
+        ValueError: If any value is out of range (validated on
+            construction, so an invalid config cannot exist).
     """
 
     temperature: float = 0.7
@@ -23,3 +27,16 @@ class GenerationConfig:
     top_k: int = 50
     max_new_tokens: int = 120
     max_ctx_tokens: int = 900
+
+    def __post_init__(self) -> None:
+        """Validate ranges so it is impossible to build an invalid config."""
+        if self.temperature <= 0:
+            raise ValueError("temperature must be positive")
+        if not (0 < self.top_p <= 1):
+            raise ValueError("top_p must be in (0, 1]")
+        if self.top_k < 0:
+            raise ValueError("top_k must be >= 0")
+        if self.max_new_tokens <= 0:
+            raise ValueError("max_new_tokens must be positive")
+        if self.max_ctx_tokens <= 0:
+            raise ValueError("max_ctx_tokens must be positive")
